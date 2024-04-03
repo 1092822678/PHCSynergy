@@ -1,0 +1,40 @@
+{
+    "name": "DrugCombDB",
+    "train_test_mode": 1,
+    "n_epochs": 500,
+    "data": {
+        "type": "Data",
+        "args":{
+            "data_dir": "Data/DrugCombDB/",
+            "batch_size": 1024,
+            "shuffle": true
+        }
+    },
+
+    "model": {
+        "type": "model",
+        "args": {
+            "e_dim": 128,
+            "hyper_dim": 1024,
+            "n_hidden_1": 2048,
+            "n_hidden_2": 1024,
+            "cell_dim": 100,
+            "EMB_INIT_EPS": 2.0,
+            "gamma": 12.0,
+            "in_channels": 1,
+            "out_channels": 8,
+            "kernel" : 5,
+            "pooling_size": 2
+        }
+    },
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr": 0.001,
+            "weight_decay": 1e-4
+        }
+    },
+
+    "patience" : 10,
+    "dropout": 0.5
+}
