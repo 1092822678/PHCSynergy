@@ -88,7 +88,7 @@ def train():
         
         # Load Pretrained Data
         print('KG-embedding loading...')
-        transE_entity_data = np.load(os.path.join(config['data']['args']['data_dir'], 'KG_TransE_l2_entity.npy'))
+        transE_entity_data = np.load(os.path.join(config['data']['args']['data_dir'], 'KG_TransR_l2_entity.npy'))
         print('Graph-embedding loading...')
         masking_entity_data = np.load(os.path.join(config['data']['args']['data_dir'], 'drug_smiles.npy'))
         print('Cellline expression loading...')

@@ -9,6 +9,29 @@ from dhg.nn import HGNNPConv
 
 cellline = 76
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    
+class HGNNP(nn.Module):
+    def __init__(
+        self,
+        in_channels: int,
+        hid_channels: int,
+        use_bn: bool = False,
+        drop_rate: float = 0.5,
+    ) -> None:
+        super().__init__()
+        self.layers = nn.ModuleList()
+        self.layers.append(
+            HGNNPConv(in_channels, hid_channels, use_bn=use_bn, drop_rate=drop_rate),
+        )
+        self.layers.append(
+            HGNNPConv(hid_channels, hid_channels, use_bn=use_bn, drop_rate=drop_rate),
+            # HGNNPConv(hid_channels, num_classes, use_bn=use_bn, is_last=True)
+        )
+
+    def forward(self, X: torch.Tensor, hg: "dhg.Hypergraph") -> torch.Tensor:
+        for layer in self.layers:
+            X = layer(X, hg)
+        return X
 
 class PHCSynergy(nn.Module):
 
@@ -154,13 +177,10 @@ class PHCSynergy(nn.Module):
         cross_embedding_pre_reverse = self.fc2_global_reverse(global_local_before_reverse)
         
         out3 = self.hgnn_drug(fts, G)
-        # out3 = self.activate(self.multi_drug(structure * entity))
-        
+ 
         out_concat = torch.cat(
                 (self.structure_pre_embed, self.entity_embed_pre, cross_embedding_pre, cross_embedding_pre_reverse, out3), 1)
-        # out_concat = torch.cat(
-        #         (self.structure_pre_embed, self.entity_embed_pre, out3), 1)
-
+   
         return out_concat
 
     
@@ -225,43 +245,4 @@ class PHCSynergy(nn.Module):
         x = self.layer3(x)
         return torch.sigmoid(x).squeeze()
     
-    
-class HGNNP(nn.Module):
-    r"""The HGNN :sup:`+` model proposed in `HGNN+: General Hypergraph Neural Networks <https://ieeexplore.ieee.org/document/9795251>`_ paper (IEEE T-PAMI 2022).
-
-    Args:
-        ``in_channels`` (``int``): :math:`C_{in}` is the number of input channels.
-        ``hid_channels`` (``int``): :math:`C_{hid}` is the number of hidden channels.
-        ``num_classes`` (``int``): The Number of class of the classification task.
-        ``use_bn`` (``bool``): If set to ``True``, use batch normalization. Defaults to ``False``.
-        ``drop_rate`` (``float``, optional): Dropout ratio. Defaults to ``0.5``.
-    """
-
-    def __init__(
-        self,
-        in_channels: int,
-        hid_channels: int,
-        use_bn: bool = False,
-        drop_rate: float = 0.5,
-    ) -> None:
-        super().__init__()
-        self.layers = nn.ModuleList()
-        self.layers.append(
-            HGNNPConv(in_channels, hid_channels, use_bn=use_bn, drop_rate=drop_rate),
-        )
-        self.layers.append(
-            HGNNPConv(hid_channels, hid_channels, use_bn=use_bn, drop_rate=drop_rate),
-            # HGNNPConv(hid_channels, num_classes, use_bn=use_bn, is_last=True)
-        )
-
-    def forward(self, X: torch.Tensor, hg: "dhg.Hypergraph") -> torch.Tensor:
-        r"""The forward function.
-
-        Args:
-            ``X`` (``torch.Tensor``): Input vertex feature matrix. Size :math:`(N, C_{in})`.
-            ``hg`` (``dhg.Hypergraph``): The hypergraph structure that contains :math:`N` vertices.
-        """
-        for layer in self.layers:
-            X = layer(X, hg)
-        return X
 
