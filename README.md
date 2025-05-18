@@ -1,3 +1,3 @@
 # MoHyperSynergy
 ## Overview
-This repository contains the source code for our paper "PHCSynargy: Pre trained multimodal feature fusion model for drug combination prediction"
+This repository contains the source code for our paper "MoHyperSynergy: A multimodal representation fusion method using hypergraph neural networks for drug synergy prediction"
